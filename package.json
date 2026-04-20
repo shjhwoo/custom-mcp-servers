@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "dev:jira": "npm run dev -w @tnh9570/jira-mcp"
+    "dev:jira": "npm run dev -w @shjhwoo/custom-jira-mcp"
   },
   "repository": {
     "type": "git",
