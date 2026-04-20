@@ -189,6 +189,20 @@ server.tool(
 );
 
 server.tool(
+  "assign-issue-to-myself",
+  "Assign a Jira issue to the currently authenticated user (yourself)",
+  {
+    issueKey: z.string().describe('Jira issue key (e.g. "PROJ-123")'),
+  },
+  async ({ issueKey }) => {
+    const result = await getClient().assignToMyself(issueKey);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+    };
+  },
+);
+
+server.tool(
   "add-comment",
   "Add a comment to a Jira issue",
   {

@@ -97,6 +97,14 @@ export class JiraClient {
     return { assigned: issueKey, epic: epicKey };
   }
 
+  async assignToMyself(issueKey: string) {
+    const me = await this.client.get("/myself");
+    await this.client.put(`/issue/${issueKey}/assignee`, {
+      accountId: me.data.accountId,
+    });
+    return { assigned: issueKey, assignee: me.data.displayName };
+  }
+
   async addComment(issueKey: string, comment: string) {
     const res = await this.client.post(`/issue/${issueKey}/comment`, {
       body: {

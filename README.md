@@ -14,6 +14,7 @@ Claude Code에서 Jira를 직접 조작할 수 있는 MCP(Model Context Protocol
 | `get-issue-transitions` | 이슈의 전환 가능한 상태 목록 조회 |
 | `update-issue-status` | 이슈 상태 변경 |
 | `assign-issue-to-epic` | 이슈를 에픽에 연결 |
+| `assign-issue-to-myself` | 이슈를 나 자신에게 할당 |
 | `add-comment` | 이슈에 댓글 추가 |
 | `delete-issue` | 이슈 삭제 |
 
