@@ -1,0 +1,41 @@
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - "*/v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+
+      - name: Detect changed package
+        id: pkg
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PKG_NAME="${TAG%/v*}"
+          echo "name=${PKG_NAME}" >> $GITHUB_OUTPUT
+          echo "path=packages/${PKG_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build -w ${{ steps.pkg.outputs.name }}
+
+      - name: Publish
+        run: npm publish
+        working-directory: ${{ steps.pkg.outputs.path }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
