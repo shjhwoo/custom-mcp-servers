@@ -1,2 +1,4 @@
 .claude/*
 .mcp.json
+node_modules/
+dist/

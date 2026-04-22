@@ -8,6 +8,10 @@ import {
   createIssueSchema,
   deleteIssue,
   deleteIssueSchema,
+  getChildIssues,
+  getChildIssuesSchema,
+  getIssue,
+  getIssueSchema,
   listIssues,
   listIssuesSchema,
   updateIssue,
@@ -121,6 +125,38 @@ async function main() {
     async (args) => {
       try {
         return toTextContent(await deleteIssue(client, args));
+      } catch (err) {
+        return toError(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    "get_issue",
+    {
+      title: "이슈 상세 조회",
+      description: "이슈 키로 단일 이슈의 상세 정보를 조회합니다.",
+      inputSchema: getIssueSchema,
+    },
+    async (args) => {
+      try {
+        return toTextContent(await getIssue(client, args));
+      } catch (err) {
+        return toError(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    "get_child_issues",
+    {
+      title: "하위 이슈 목록 조회",
+      description: "상위 이슈 키로 하위 이슈(child issues) 목록을 조회합니다.",
+      inputSchema: getChildIssuesSchema,
+    },
+    async (args) => {
+      try {
+        return toTextContent(await getChildIssues(client, args));
       } catch (err) {
         return toError(err);
       }

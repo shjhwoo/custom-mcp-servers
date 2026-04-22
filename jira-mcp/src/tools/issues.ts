@@ -130,6 +130,48 @@ export async function deleteIssue(
   return { ok: true, deleted: args.issueKey };
 }
 
+export const getIssueSchema = {
+  issueKey: z.string().describe("이슈 키 (예: ST-1202)"),
+  fields: z
+    .array(z.string())
+    .optional()
+    .describe("반환 필드 목록 (기본: summary,status,assignee,priority,issuetype,parent,subtasks,description)"),
+};
+
+export async function getIssue(
+  client: JiraClient,
+  args: { issueKey: string; fields?: string[] }
+) {
+  const fields =
+    args.fields && args.fields.length > 0
+      ? args.fields.join(",")
+      : "summary,status,assignee,priority,issuetype,parent,subtasks,description";
+  return client.request(
+    "GET",
+    `/rest/api/3/issue/${encodeURIComponent(args.issueKey)}?fields=${fields}`
+  );
+}
+
+export const getChildIssuesSchema = {
+  parentKey: z.string().describe("상위 이슈 키 (예: ST-1202)"),
+  fields: z
+    .array(z.string())
+    .optional()
+    .describe("반환 필드 목록 (기본: summary,status,assignee,priority,issuetype)"),
+  maxResults: z.number().int().min(1).max(100).default(50),
+};
+
+export async function getChildIssues(
+  client: JiraClient,
+  args: { parentKey: string; fields?: string[]; maxResults?: number }
+) {
+  return listIssues(client, {
+    jql: `parent = ${args.parentKey} ORDER BY created ASC`,
+    fields: args.fields,
+    maxResults: args.maxResults ?? 50,
+  });
+}
+
 export const listIssuesSchema = {
   jql: z
     .string()
