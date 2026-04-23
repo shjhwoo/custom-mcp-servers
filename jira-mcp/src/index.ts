@@ -19,6 +19,7 @@ import {
 } from "./tools/issues.js";
 import { getSprintStatus, getSprintStatusSchema } from "./tools/sprint.js";
 import { assignIssue, assignIssueSchema } from "./tools/assignIssue.js";
+import { transitionIssue, transitionIssueSchema } from "./tools/transitionIssue.js";
 
 function toTextContent(value: unknown) {
   const text =
@@ -174,6 +175,23 @@ async function main() {
     async (args) => {
       try {
         return toTextContent(await assignIssue(client, args));
+      } catch (err) {
+        return toError(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    "transition_issue",
+    {
+      title: "이슈 상태 변경",
+      description:
+        "이슈 키와 목표 상태 이름으로 Jira 이슈의 상태를 전환합니다. 가능한 전환 목록은 이슈별로 다릅니다.",
+      inputSchema: transitionIssueSchema,
+    },
+    async (args) => {
+      try {
+        return toTextContent(await transitionIssue(client, args));
       } catch (err) {
         return toError(err);
       }
