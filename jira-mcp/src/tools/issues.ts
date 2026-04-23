@@ -34,6 +34,10 @@ export const createIssueSchema = {
     .optional()
     .describe("프로젝트 키 override. 생략 시 설정값 사용"),
   labels: z.array(z.string()).optional().describe("라벨 목록"),
+  parentKey: z
+    .string()
+    .optional()
+    .describe("상위 이슈 키 (예: ST-1202). Epic 하위 이슈 생성 시 사용"),
 };
 
 export async function createIssue(
@@ -46,6 +50,7 @@ export async function createIssue(
     priority?: string;
     projectKey?: string;
     labels?: string[];
+    parentKey?: string;
   }
 ) {
   const fields: Record<string, unknown> = {
@@ -58,6 +63,7 @@ export async function createIssue(
     fields.assignee = { accountId: args.assigneeAccountId };
   if (args.priority) fields.priority = { name: args.priority };
   if (args.labels && args.labels.length > 0) fields.labels = args.labels;
+  if (args.parentKey) fields.parent = { key: args.parentKey };
 
   return client.request("POST", "/rest/api/3/issue", { fields });
 }
@@ -73,6 +79,11 @@ export const updateIssueSchema = {
     .describe("담당자 accountId. null 전달 시 담당자 해제"),
   priority: z.string().optional(),
   labels: z.array(z.string()).optional(),
+  parentKey: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("상위 이슈 키 (예: ST-1202). null 전달 시 부모 해제"),
 };
 
 export async function updateIssue(
@@ -84,6 +95,7 @@ export async function updateIssue(
     assigneeAccountId?: string | null;
     priority?: string;
     labels?: string[];
+    parentKey?: string | null;
   }
 ) {
   const fields: Record<string, unknown> = {};
@@ -97,6 +109,8 @@ export async function updateIssue(
         : { accountId: args.assigneeAccountId };
   if (args.priority !== undefined) fields.priority = { name: args.priority };
   if (args.labels !== undefined) fields.labels = args.labels;
+  if (args.parentKey !== undefined)
+    fields.parent = args.parentKey === null ? null : { key: args.parentKey };
 
   if (Object.keys(fields).length === 0) {
     throw new Error("No fields to update.");
